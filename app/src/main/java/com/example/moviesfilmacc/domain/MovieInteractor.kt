@@ -10,7 +10,8 @@ import retrofit2.Response
 class MovieInteractor(private val githubService: MovieService, private val reposRepository: MovieRepository) {
 
     fun getRepos(username: String, callback: GetRepoCallback) {
-        githubService.getUserRepos(username).enqueue(object : Callback<List<MovieItem>> {
+        //githubService.getUserRepos(username).enqueue(object : Callback<List<MovieItem>> {
+        githubService.getUserRepos().enqueue(object : Callback<List<MovieItem>> {
             override fun onResponse(call: Call<List<MovieItem>>, response: Response<List<MovieItem>>) {
                 if (response.isSuccessful) {
                     reposRepository.addToCache(response.body()!!)

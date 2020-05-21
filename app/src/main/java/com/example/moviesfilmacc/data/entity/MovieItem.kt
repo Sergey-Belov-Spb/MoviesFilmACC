@@ -4,10 +4,18 @@ import com.google.gson.annotations.SerializedName
 
 class MovieItem {
 
-    @SerializedName("git_url")
+    @SerializedName("poster_path")
     lateinit var gitUrl: String
+    @SerializedName("id")
+    var id: Int? = null
+    @SerializedName("title")
+    lateinit var title: String
+    @SerializedName("favorite")
+    var favorite: Boolean? = null
 
-    constructor() {}
+    /*@SerializedName("git_url")
+    lateinit var gitUrl: String*/
+
 
     constructor(gitUrl: String) {
         this.gitUrl = gitUrl

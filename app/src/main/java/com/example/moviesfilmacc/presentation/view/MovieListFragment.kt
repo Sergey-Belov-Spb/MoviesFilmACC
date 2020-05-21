@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,6 +16,7 @@ import com.example.moviesfilmacc.R
 import com.example.moviesfilmacc.data.entity.MovieItem
 import com.example.moviesfilmacc.presentation.viewmodel.MovieListViewModel
 import java.util.ArrayList
+import com.bumptech.glide.Glide
 //import java.util.Observer
 
 class MovieListFragment : Fragment() {
@@ -39,8 +41,8 @@ class MovieListFragment : Fragment() {
 
     private fun initRecycler() {
         adapter = ReposAdapter(LayoutInflater.from(context), object : ReposAdapter.OnRepoSelectedListener {
-            override fun onRepoSelect(url: String) {
-                viewModel!!.onRepoSelect(url)
+            override fun onRepoSelect(url: MovieItem) {
+                viewModel!!.onRepoSelect(url.title)
             }
         })
         recyclerView = view!!.findViewById(R.id.recyclerView)
@@ -48,9 +50,23 @@ class MovieListFragment : Fragment() {
     }
 
     class RepoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nameMovie=itemView.findViewById<TextView>(R.id.nameMovieInAll)
+        val picFavorite=itemView.findViewById<ImageView>(R.id.imageFavoriteAll)
+        val imageFilm = itemView.findViewById<ImageView>(R.id.imageMovieInAll)
 
-        fun bind(url: String) {
-            (itemView as TextView).text = url
+        fun bind(item: MovieItem) {
+            nameMovie.text = item.title
+            if (item.favorite== true) {picFavorite.setImageResource(R.drawable.ic_favorite_black_24dp)}
+            else {picFavorite.setImageResource(R.drawable.ic_favorite_border_black_24dp)}
+
+            Glide.with(imageFilm.context)
+                .load(item.gitUrl)
+                .placeholder(R.drawable.ic_image_blue)
+                .error(R.drawable.ic_error_blue)
+                .override(imageFilm.resources.getDimensionPixelSize(R.dimen.image_size))
+                .centerCrop()
+                .into(imageFilm)
+            //(itemView as TextView).text = url
         }
     }
 
@@ -69,8 +85,10 @@ class MovieListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RepoViewHolder, position: Int) {
-            holder.bind(items[position].gitUrl)
-            holder.itemView.setOnClickListener { v -> listener.onRepoSelect(items[position].gitUrl) }
+            holder.bind(items[position])
+            holder.itemView.setOnClickListener {
+                    v -> listener.onRepoSelect(items[position])
+            }
         }
 
         override fun getItemCount(): Int {
@@ -78,7 +96,7 @@ class MovieListFragment : Fragment() {
         }
 
         interface OnRepoSelectedListener {
-            fun onRepoSelect(url: String)
+            fun onRepoSelect(url: MovieItem)
         }
     }
 }

@@ -19,7 +19,6 @@ class MovieDetailedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val viewModel = ViewModelProviders.of(activity!!).get<MovieListViewModel>(MovieListViewModel::class.java!!)
         viewModel.selectedRepoUrl.observe(this.viewLifecycleOwner, Observer<String> { s -> view.findViewById<TextView>(R.id.textView).setText(s) })
     }
