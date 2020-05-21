@@ -49,6 +49,7 @@ class MovieListFragment : Fragment() {
         recyclerView!!.adapter = adapter
     }
 
+
     class RepoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameMovie=itemView.findViewById<TextView>(R.id.nameMovieInAll)
         val picFavorite=itemView.findViewById<ImageView>(R.id.imageFavoriteAll)
