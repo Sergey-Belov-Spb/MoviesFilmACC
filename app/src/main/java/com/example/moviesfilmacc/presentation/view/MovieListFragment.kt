@@ -20,6 +20,10 @@ import com.bumptech.glide.Glide
 //import java.util.Observer
 
 class MovieListFragment : Fragment() {
+    companion object{
+        const val TAG = "MovieListFragment"
+    }
+
     private var viewModel: MovieListViewModel? = null
     private var recyclerView: RecyclerView? = null
     private var adapter: ReposAdapter? = null
@@ -32,23 +36,24 @@ class MovieListFragment : Fragment() {
         initRecycler()
 
         viewModel = ViewModelProviders.of(activity!!).get(MovieListViewModel::class.java!!)
-        viewModel!!.repos.observe(this.viewLifecycleOwner, Observer<List<MovieItem>> { repos -> adapter!!.setItems(repos)})
+        viewModel!!.moviesAll.observe(this.viewLifecycleOwner, Observer<List<MovieItem>> { repos -> adapter!!.setItems(repos)})
         viewModel!!.error.observe(this.viewLifecycleOwner, Observer<String> { error -> Toast.makeText(context, error, Toast.LENGTH_SHORT).show() })
 
-        view.findViewById<View>(R.id.getDataBtn).setOnClickListener { v -> viewModel!!.onGetDataClick() }
 
+
+        view.findViewById<View>(R.id.getDataBtn).setOnClickListener { v -> viewModel!!.onGetDataClick() }
     }
 
     private fun initRecycler() {
         adapter = ReposAdapter(LayoutInflater.from(context), object : ReposAdapter.OnRepoSelectedListener {
-            override fun onRepoSelect(url: MovieItem) {
-                viewModel!!.onRepoSelect(url.title)
+            override fun onRepoSelect(item: MovieItem, addToFavorite: Boolean) {
+                viewModel!!.onRepoSelect(item,addToFavorite)
+                adapter?.notifyDataSetChanged()
             }
         })
         recyclerView = view!!.findViewById(R.id.recyclerView)
         recyclerView!!.adapter = adapter
     }
-
 
     class RepoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameMovie=itemView.findViewById<TextView>(R.id.nameMovieInAll)
@@ -77,7 +82,6 @@ class MovieListFragment : Fragment() {
         fun setItems(repos: List<MovieItem>) {
             items.clear()
             items.addAll(repos)
-
             notifyDataSetChanged()
         }
 
@@ -87,8 +91,13 @@ class MovieListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: RepoViewHolder, position: Int) {
             holder.bind(items[position])
-            holder.itemView.setOnClickListener {
-                    v -> listener.onRepoSelect(items[position])
+            holder.itemView.findViewById<ImageView>(R.id.imageFavoriteAll).setOnClickListener{
+                v -> listener.onRepoSelect(items[position],true)
+
+            }
+            holder.itemView.findViewById<ImageView>(R.id.imageMovieInAll).setOnClickListener{
+            //holder.itemView.setOnClickListener {
+                    v -> listener.onRepoSelect(items[position],false)
             }
         }
 
@@ -97,7 +106,7 @@ class MovieListFragment : Fragment() {
         }
 
         interface OnRepoSelectedListener {
-            fun onRepoSelect(url: MovieItem)
+            fun onRepoSelect(item: MovieItem,addToFavorite: Boolean)
         }
     }
 }
