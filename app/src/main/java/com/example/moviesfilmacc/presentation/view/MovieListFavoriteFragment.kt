@@ -24,6 +24,8 @@ class MovieListFavoriteFragment: Fragment()  {
     private var adapter : ReposAdapter? = null
     private var recyclerView: RecyclerView? = null
 
+    var listener :MovieListListener? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_movie_list, container, false)
     }
@@ -42,8 +44,11 @@ class MovieListFavoriteFragment: Fragment()  {
             LayoutInflater.from(context),
             object : MovieListFavoriteFragment.ReposAdapter.OnRepoSelectedListener {
                 override fun onRepoSelect(item: MovieItem, addToFavorite: Boolean) {
-                    viewModel!!.onRepoSelect(item, addToFavorite)
-                    adapter?.notifyDataSetChanged()
+                    if (addToFavorite==false) { listener?.onMovieSelected(item)}
+                    else {
+                        viewModel!!.onMovieSelect(item,addToFavorite)
+                        adapter?.notifyDataSetChanged()
+                    }
                 }
             })
         recyclerView = view!!.findViewById(R.id.recyclerView)
@@ -51,7 +56,7 @@ class MovieListFavoriteFragment: Fragment()  {
     }
 
 
-    class ReposAdapter(private val inflater: LayoutInflater, private val listener: OnRepoSelectedListener) : RecyclerView.Adapter<MovieListFragment.RepoViewHolder>() {
+    class ReposAdapter(private val inflater: LayoutInflater, private val listener: OnRepoSelectedListener) : RecyclerView.Adapter<MovieListFragment.MovieViewHolder>() {
         private val items = ArrayList<MovieItem>()
 
         fun setItems(repos: List<MovieItem>) {
@@ -62,8 +67,8 @@ class MovieListFavoriteFragment: Fragment()  {
             notifyDataSetChanged()
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieListFragment.RepoViewHolder {
-            return MovieListFragment.RepoViewHolder(
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieListFragment.MovieViewHolder {
+            return MovieListFragment.MovieViewHolder(
                 inflater.inflate(
                     R.layout.item_movie,
                     parent,
@@ -72,15 +77,14 @@ class MovieListFavoriteFragment: Fragment()  {
             )
         }
 
-        override fun onBindViewHolder(holder: MovieListFragment.RepoViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: MovieListFragment.MovieViewHolder, position: Int) {
             holder.bind(items[position])
-            holder.itemView.findViewById<ImageView>(R.id.imageFavoriteAll).setOnClickListener{
-                    v -> listener.onRepoSelect(items[position],true)
+            holder.itemView.findViewById<ImageView>(R.id.imageFavoriteAll).setOnClickListener{ v ->
+                listener.onRepoSelect(items[position],true)
 
             }
-            holder.itemView.findViewById<ImageView>(R.id.imageMovieInAll).setOnClickListener{
-                //holder.itemView.setOnClickListener {
-                    v -> listener.onRepoSelect(items[position],false)
+            holder.itemView.findViewById<ImageView>(R.id.imageMovieInAll).setOnClickListener{ v ->
+                listener.onRepoSelect(items[position],false)
             }
         }
 
@@ -91,4 +95,8 @@ class MovieListFavoriteFragment: Fragment()  {
         interface OnRepoSelectedListener {
             fun onRepoSelect(item: MovieItem,addToFavorite: Boolean)
         }
-    }}
+    }
+    interface MovieListListener {
+        fun onMovieSelected(moviesItemDetailed: MovieItem)
+    }
+}

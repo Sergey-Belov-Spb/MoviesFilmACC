@@ -1,17 +1,18 @@
 package com.example.moviesfilmacc.presentation.view
 
 
-
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.example.moviesfilmacc.R
+import com.example.moviesfilmacc.data.entity.MovieItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity(), MovieListFragment.MovieListListener,MovieListFavoriteFragment.MovieListListener {
     companion object{
         const val TAG = "MainActiviry"
     }
@@ -40,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun openAllMoviesList(){
         supportFragmentManager
             .beginTransaction()
@@ -57,7 +57,32 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    private fun openDetailedFragment(movieItem: MovieItem) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer,MovieDetailedFragment.newInstance(movieItem.title,movieItem.gitUrl),MovieDetailedFragment.TAG)
+            .addToBackStack("Detaled")
+            .commit()
+    }
 
+    override fun onAttachFragment(fragment: Fragment) {
+        super.onAttachFragment(fragment)
+        if (fragment is MovieListFragment)
+        {
+            fragment.listener = this
+            Log.d(TAG,"onAttachFragment -> MovieListFragment")
+        }
+        if (fragment is MovieListFavoriteFragment)
+        {
+            fragment.listener = this
+            Log.d(TAG,"onAttachFragment -> MovieListFavoriteFragment")
+        }
+    }
+
+    override fun onMovieSelected(moviesItemDetailed: MovieItem) {
+        Log.d(TAG,"Show Detailed")
+        openDetailedFragment(moviesItemDetailed)
+    }
 }
 
 /*class MainActivity : AppCompatActivity() {

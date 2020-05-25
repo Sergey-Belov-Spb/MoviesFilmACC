@@ -10,17 +10,18 @@ import com.example.moviesfilmacc.domain.MovieInteractor
 import java.util.ArrayList
 
 class MovieListViewModel: ViewModel() {
-    private val reposLiveData = MutableLiveData<List<MovieItem>>()
+    private val allMoviesLiveData = MutableLiveData<List<MovieItem>>()
     private val favoriteLiveData = MutableLiveData<List<MovieItem>>()
     private val errorLiveData = MutableLiveData<String>()
-    private val selectedRepoUrlLiveData = MutableLiveData<String>()
+    private var activeInternetRequestData = false
+
 
     private val itemsFavorite = ArrayList<MovieItem>()
 
     private val githubInteractor = App.instance!!.movieInteractor
 
     val moviesAll: LiveData<List<MovieItem>>
-        get() = reposLiveData
+        get() = allMoviesLiveData
 
     val moviesFavorite: LiveData<List<MovieItem>>
         get() = favoriteLiveData
@@ -28,22 +29,27 @@ class MovieListViewModel: ViewModel() {
     val error: LiveData<String>
         get() = errorLiveData
 
-    val selectedRepoUrl: LiveData<String>
-        get() = selectedRepoUrlLiveData
 
     fun onGetDataClick() {
-        githubInteractor.getRepos("octocat", object : MovieInteractor.GetRepoCallback {
-            override fun onSuccess(repos: List<MovieItem>) {
-                reposLiveData.postValue(repos)
-            }
+        if (activeInternetRequestData == false) {
+            activeInternetRequestData=true
+            githubInteractor.getNewMovies(object : MovieInteractor.GetMoviesCallback {
+                override fun onSuccess(newMovies: List<MovieItem>) {
+                    activeInternetRequestData=false
+                    allMoviesLiveData.postValue(newMovies)
+                }
 
-            override fun onError(error: String) {
-                errorLiveData.postValue(error)
-            }
-        })
+                override fun onError(error: String) {
+                    activeInternetRequestData=false
+                    errorLiveData.postValue(error)
+                }
+            })
+        } else {
+            Log.d("MovieListViewModel","Block New data Request!!")
+        }
     }
 
-    fun onRepoSelect(item: MovieItem, addToFavotite: Boolean) {
+    fun onMovieSelect(item: MovieItem, addToFavotite: Boolean) {
         if (addToFavotite){
             Log.d("MovieListViewModel","AddToFavorite")
             if (item.favorite == true) {
@@ -57,14 +63,7 @@ class MovieListViewModel: ViewModel() {
             else {
                 itemsFavorite.remove(item)
             }
-
-            favoriteLiveData.postValue(reposLiveData.value)
-            val movieFavorite = favoriteLiveData.value
-
-        }
-        else {
-            selectedRepoUrlLiveData.postValue(item.title)
+            favoriteLiveData.postValue(allMoviesLiveData.value)
         }
     }
-
 }

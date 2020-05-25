@@ -9,7 +9,7 @@ import retrofit2.Response
 
 class MovieInteractor(private val githubService: MovieService, private val reposRepository: MovieRepository) {
 
-    fun getRepos(username: String, callback: GetRepoCallback) {
+    fun getNewMovies(callback: GetMoviesCallback) {
         //githubService.getUserRepos(username).enqueue(object : Callback<List<MovieItem>> {
         githubService.getUserRepos().enqueue(object : Callback<List<MovieItem>> {
             override fun onResponse(call: Call<List<MovieItem>>, response: Response<List<MovieItem>>) {
@@ -21,15 +21,14 @@ class MovieInteractor(private val githubService: MovieService, private val repos
                     callback.onError(response.code().toString() + "")
                 }
             }
-
             override fun onFailure(call: Call<List<MovieItem>>, t: Throwable) {
                 callback.onError("Network error probably...")
             }
         })
     }
 
-    interface GetRepoCallback {
-        fun onSuccess(repos: List<MovieItem>)
+    interface GetMoviesCallback {
+        fun onSuccess(newMovies: List<MovieItem>)
         fun onError(error: String)
     }
 }
