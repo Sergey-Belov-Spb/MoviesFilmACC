@@ -7,6 +7,9 @@ import retrofit2.http.Path
 
 
 interface MovieService {
-    @GET("users/{user}/repos")
-    fun getUserRepos(@Path("user") user: String): Call<List<MovieItem>>
+    @GET("films")
+    fun getUserRepos(): Call<List<MovieItem>>
+
+    //@GET("users/{user}/repos")
+    //fun getUserRepos(@Path("user") user: String): Call<List<MovieItem>>
 }

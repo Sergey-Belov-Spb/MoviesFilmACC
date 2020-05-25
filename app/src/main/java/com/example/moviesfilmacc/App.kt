@@ -38,7 +38,7 @@ class App : Application(){
             .build()
 
         movieService = Retrofit.Builder()
-            .baseUrl("https://api.github.com/")
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(Gson()))
             .build()
@@ -49,6 +49,10 @@ class App : Application(){
 
 
     companion object{
+        const val BASE_URL = "https://my-json-server.typicode.com/shustreek/demo/"
+        //const val BASE_URL = "https://api.github.com/"
+
+
         var instance : App? = null
             private set
     }
